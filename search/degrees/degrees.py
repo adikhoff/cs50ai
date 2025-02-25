@@ -62,15 +62,10 @@ def main():
     load_data(directory)
     print("Data loaded.")
 
-    # src = input("Name: ")
-    # dest = input("Name: ")
-    src = "Emma Watson"
-    dest = "Kevin Bacon"
-
-    source = person_id_for_name(src)
+    source = person_id_for_name(input("Name: "))
     if source is None:
         sys.exit("Person not found.")
-    target = person_id_for_name(dest)
+    target = person_id_for_name(input("Name: "))
     if target is None:
         sys.exit("Person not found.")
 
@@ -96,10 +91,32 @@ def shortest_path(source, target):
 
     If no possible path, returns None.
     """
+    start = Node(state=source, parent=None, action=None)
+    frontier = QueueFrontier()
 
-    path = [('112384', '705'), ('104257', '102')]
-    return path
+    frontier.add(start)
+    explored = set()
 
+    while True:
+        if (frontier.empty()):
+            return None
+
+        current = frontier.remove()
+        if (current.state == target):
+            path = []
+            while (current.action):
+                path.append((current.action, current.state))
+                current = current.parent
+            path.reverse()
+            return path
+        
+        explored.add(current.state)
+        neighbors = neighbors_for_person(current.state)
+        for (movie_id, person_id) in neighbors:
+            if not frontier.contains_state(person_id) and person_id not in explored:
+                child = Node(state=person_id, parent=current, action=movie_id)
+                frontier.add(child)
+                
 
 def person_id_for_name(name):
     """
