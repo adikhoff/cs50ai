@@ -301,7 +301,7 @@ class MinesweeperAI():
             1) have not already been chosen, and
             2) are not known to be mines
         """
-        bestCell = None
+        bestCells = []
         lowrisk = float("inf")
         for i in range(0, self.height):
             for j in range(0, self.width):
@@ -311,8 +311,14 @@ class MinesweeperAI():
                     for sentence in self.knowledge:
                         if cell in sentence.cells:
                             cellScore = max(cellScore, sentence.count)
+                    if (cellScore == lowrisk):
+                        bestCells.append(cell)
                     if (cellScore < lowrisk):
                         lowrisk = cellScore
-                        bestCell = cell
+                        bestCells = []
+                        bestCells.append(cell)
+        if (len(bestCells) == 0):
+            return None
+        bestCell = bestCells[random.randint(0, len(bestCells) - 1)]
         return bestCell
                 

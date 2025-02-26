@@ -142,12 +142,12 @@ while True:
     pygame.draw.rect(screen, WHITE, aiButton)
     screen.blit(buttonText, buttonRect)
 
-    # AI Move button
+    # AI Moves button
     aiMovesButton = pygame.Rect(
-        (2 / 3) * width + BOARD_PADDING, (1 / 3) * height - 150,
+        (2 / 3) * width + BOARD_PADDING, (1 / 3) * height + 90,
         (width / 3) - BOARD_PADDING * 2, 50
     )
-    buttonText = mediumFont.render("AI Moves", True, BLACK)
+    buttonText = mediumFont.render("Run AI", True, BLACK)
     buttonRect = buttonText.get_rect()
     buttonRect.center = aiMovesButton.center
     pygame.draw.rect(screen, WHITE, aiMovesButton)
