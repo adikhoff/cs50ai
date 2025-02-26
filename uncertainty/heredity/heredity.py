@@ -36,6 +36,12 @@ PROBS = {
     "mutation": 0.01
 }
 
+PARENT_GENE_PROBS = [
+    PROBS["mutation"], 
+    0.5, 
+    1 - PROBS["mutation"]
+]
+
 
 def main():
 
@@ -136,15 +142,6 @@ def numgenes(person, one_gene, two_genes):
         genes = 2
     return genes
 
-    
-def parent_gene_probability(person, one_gene, two_genes):
-    gene_prob = PROBS["mutation"]
-    if person in one_gene:
-        gene_prob = 0.5
-    if person in two_genes:
-        gene_prob = 1 - PROBS["mutation"]
-    return gene_prob
-
 
 def joint_probability(people, one_gene, two_genes, have_trait):
     """
@@ -165,8 +162,8 @@ def joint_probability(people, one_gene, two_genes, have_trait):
         mother = people[person]['mother']
         father = people[person]['father']
         if mother and father:
-            motherprob = parent_gene_probability(mother, one_gene, two_genes)
-            fatherprob = parent_gene_probability(father, one_gene, two_genes)
+            motherprob = PARENT_GENE_PROBS[numgenes(mother, one_gene, two_genes)]
+            fatherprob = PARENT_GENE_PROBS[numgenes(father, one_gene, two_genes)]
             match (genes):
                 case 0:
                     probability *= (1 - motherprob) * (1 - fatherprob)
