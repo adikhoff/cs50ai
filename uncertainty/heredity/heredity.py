@@ -137,7 +137,7 @@ def numgenes(person, one_gene, two_genes):
     return genes
 
     
-def parent_gene_prob(person, one_gene, two_genes):
+def parent_gene_probability(person, one_gene, two_genes):
     gene_prob = PROBS["mutation"]
     if person in one_gene:
         gene_prob = 0.5
@@ -157,32 +157,30 @@ def joint_probability(people, one_gene, two_genes, have_trait):
         * everyone in set `have_trait` has the trait, and
         * everyone not in set` have_trait` does not have the trait.
     """
-    overall_probability = 1
+    probability = 1
     
     for person in people:
-        person_gene_probability = 1
         has_trait = person in have_trait
         genes = numgenes(person, one_gene, two_genes)
         mother = people[person]['mother']
         father = people[person]['father']
         if mother and father:
-            motherprob = parent_gene_prob(mother, one_gene, two_genes)
-            fatherprob = parent_gene_prob(father, one_gene, two_genes)
-            if genes == 0:
-                person_gene_probability *= (1 - motherprob) * (1 - fatherprob)
-            elif genes == 1:
-                person_gene_probability *= motherprob * \
-                    (1 - fatherprob) + (1 - motherprob) * fatherprob
-            elif genes == 2:
-                person_gene_probability *= motherprob * fatherprob
+            motherprob = parent_gene_probability(mother, one_gene, two_genes)
+            fatherprob = parent_gene_probability(father, one_gene, two_genes)
+            match (genes):
+                case 0:
+                    probability *= (1 - motherprob) * (1 - fatherprob)
+                case 1:
+                    probability *= motherprob * (1 - fatherprob) + (1 - motherprob) * fatherprob
+                case 2:
+                    probability *= motherprob * fatherprob
         else:
             # no parents
-            person_gene_probability *= PROBS["gene"][genes]
+            probability *= PROBS["gene"][genes]
         
-        person_trait_probability = PROBS["trait"][genes][has_trait]
-        overall_probability *= person_gene_probability * person_trait_probability
+        probability *= PROBS["trait"][genes][has_trait]
 
-    return overall_probability
+    return probability
 
 
 def update(probabilities, one_gene, two_genes, have_trait, p):
