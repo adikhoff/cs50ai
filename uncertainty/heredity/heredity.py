@@ -200,7 +200,7 @@ def update(probabilities, one_gene, two_genes, have_trait, p):
         probabilities[person]['trait'][has_trait] += p
 
 
-def _normalize(dict):
+def normalize_dict(dict):
     total = 0
     for key in dict:
         total += dict[key]
@@ -214,8 +214,8 @@ def normalize(probabilities):
     is normalized (i.e., sums to 1, with relative proportions the same).
     """
     for person in probabilities:
-        _normalize(probabilities[person]['gene'])
-        _normalize(probabilities[person]['trait'])
+        normalize_dict(probabilities[person]['gene'])
+        normalize_dict(probabilities[person]['trait'])
 
 
 if __name__ == "__main__":
