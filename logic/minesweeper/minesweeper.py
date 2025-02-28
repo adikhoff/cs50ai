@@ -209,7 +209,6 @@ class MinesweeperAI():
 
         This function should:
         """
-        new_mines = []        
         # 1) mark the cell as a move that has been made
         self.moves_made.add(cell)
         
@@ -244,7 +243,6 @@ class MinesweeperAI():
             for cell in mines:
                 sweeping = True
                 self.mark_mine(cell)
-                new_mines.append(cell)
             for sentence in self.findEmptySentences():
                 sweeping = True
                 self.knowledge.remove(sentence)
@@ -256,7 +254,6 @@ class MinesweeperAI():
                     sweeping = True
                     self.knowledge.append(sentence)
         self.print_knowledge()
-        return new_mines
 
     def inferSubsets(self):
         newSentences = []
@@ -292,6 +289,13 @@ class MinesweeperAI():
         for move in self.safes:
             if move not in self.moves_made:
                 return move
+        return None
+
+    def make_mark_mine_move(self):
+        for mine in self.mines:
+            if mine not in self.moves_made:
+                self.moves_made.add(mine)
+                return mine
         return None
 
     def make_random_move(self):

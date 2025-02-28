@@ -50,6 +50,23 @@ lost = False
 instructions = True
 running = False
 
+def make_ai_move(ai):
+    mark_mine = ai.make_mark_mine_move()
+    if not mark_mine is None:
+        return (True, mark_mine)
+    
+    move = ai.make_safe_move()
+    if move is None:
+        move = ai.make_random_move()
+        if move is None:
+            flags = ai.mines.copy()
+            print("No moves left to make.")
+        else:
+            print("No known safe moves, AI making random move.")
+    else:
+        print("AI making safe move.")
+    return (False, move)
+
 while True:
 
     # Check if game quit
@@ -172,6 +189,7 @@ while True:
     screen.blit(text, textRect)
 
     move = None
+    mark_mine = None
 
     left, _, right = pygame.mouse.get_pressed()
     
@@ -192,16 +210,11 @@ while True:
 
         # If AI button clicked, make an AI move
         if aiButton.collidepoint(mouse) and not lost:
-            move = ai.make_safe_move()
-            if move is None:
-                move = ai.make_random_move()
-                if move is None:
-                    flags = ai.mines.copy()
-                    print("No moves left to make.")
-                else:
-                    print("No known safe moves, AI making random move.")
+            mark_or_move = make_ai_move(ai)
+            if mark_or_move[0]:
+                mark_mine = mark_or_move[1]
             else:
-                print("AI making safe move.")
+                move = mark_or_move[1]
             time.sleep(0.2)
 
         # If AI Moves button clicked, start running
@@ -227,18 +240,22 @@ while True:
                             and (i, j) not in revealed):
                         move = (i, j)
     if running:
-        print("continue run")
-        move = ai.make_safe_move()
-        if move is None:
-            print("AI making random move.")
-            move = ai.make_random_move()
+        if lost:
             running = False
+        print("continue run")
+        mark_or_move = make_ai_move(ai)
+        if mark_or_move[0]:
+            mark_mine = mark_or_move[1]
         else:
-            print("AI making safe move.")
-
+            move = mark_or_move[1]
+        if not move and not mark_mine:
+            running = False
 
     # Make move and update AI knowledge
-    if move:
+    if mark_mine:
+        flags.add(mark_mine)
+        
+    elif move:
         if game.is_mine(move):
             lost = True
         else:
@@ -249,9 +266,7 @@ while True:
                 m = moves.pop()
                 nearby = game.nearby_mines(m)
                 revealed.add(m)
-                new_mines = ai.add_knowledge(m, nearby)
-                for cell in new_mines:
-                    flags.add(cell)
+                ai.add_knowledge(m, nearby)
                 done.append(m)
                 if (nearby == 0):
                     cells = ai.neighbors(m)
