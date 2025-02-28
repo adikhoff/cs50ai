@@ -121,6 +121,10 @@ class NimAI():
         self.q[tuple(state), action] = old_q + self.alpha * (reward + future_rewards - old_q)
         
     def best_action(self, state):
+        """
+          Return the available action that has the best Q-value
+          for the given state `state`.
+        """
         available = Nim.available_actions(state)
         q_action = (float("-inf"), None)
         for action in available:
