@@ -126,12 +126,12 @@ class NimAI():
           for the given state `state`.
         """
         available = Nim.available_actions(state)
-        q_action = (float("-inf"), None)
+        best_q_action = (float("-inf"), None)
         for action in available:
             q = self.get_q_value(state, action)
-            if q > q_action[0]:
-                q_action = (q, action)
-        return q_action[1]
+            if q > best_q_action[0]:
+                best_q_action = (q, action)
+        return best_q_action[1]
 
     def best_future_reward(self, state):
         """
