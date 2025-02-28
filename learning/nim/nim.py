@@ -125,9 +125,8 @@ class NimAI():
           Return the available action that has the best Q-value
           for the given state `state`.
         """
-        available = Nim.available_actions(state)
         best_q_action = (float("-inf"), None)
-        for action in available:
+        for action in Nim.available_actions(state):
             q = self.get_q_value(state, action)
             if q > best_q_action[0]:
                 best_q_action = (q, action)
