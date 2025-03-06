@@ -68,7 +68,7 @@ def load_data(data_dir, save_dir=None):
         print(f"reading dir {dir}")
         for file_name in os.listdir(dir):
             image = cv2.imread(f"{dir}{os.sep}{file_name}")
-            height, width, chan = image.shape
+            height, width = image.shape[:2]
             if height != IMG_HEIGHT or width != IMG_WIDTH:
                 image = cv2.resize(image, (IMG_HEIGHT, IMG_WIDTH), interpolation=cv2.INTER_AREA)
             if save_dir != None:
@@ -100,6 +100,8 @@ def get_model():
         tf.keras.layers.Flatten(),
         tf.keras.layers.Dense(128, activation="relu"),
         tf.keras.layers.Dense(128, activation="relu"),
+        tf.keras.layers.Dense(128, activation="relu"),
+        # tf.keras.layers.Dense(256, activation="relu"),
         tf.keras.layers.Dropout(0.50),
         tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax")
     ])
