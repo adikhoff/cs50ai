@@ -12,6 +12,9 @@ IMG_HEIGHT = 30
 NUM_CATEGORIES = 43
 TEST_SIZE = 0.4
 
+# Config GPUs
+print("Config: ", tf.config.list_physical_devices())
+
 
 def main():
 
@@ -44,7 +47,7 @@ def main():
         print(f"Model saved to {filename}.")
 
 
-def load_data(data_dir):
+def load_data(data_dir, save_dir=None):
     """
     Load image data from directory `data_dir`.
 
@@ -67,10 +70,20 @@ def load_data(data_dir):
             image = cv2.imread(f"{dir}{os.sep}{file_name}")
             height, width, chan = image.shape
             if height != IMG_HEIGHT or width != IMG_WIDTH:
-                image.resize((IMG_HEIGHT, IMG_WIDTH, 3))
+                image = cv2.resize(image, (IMG_HEIGHT, IMG_WIDTH), interpolation=cv2.INTER_AREA)
+            if save_dir != None:
+                save_image(save_dir, file_name, image)
             images.append(image)
             labels.append(i)
     return (images, labels)
+
+
+def save_image(save_dir, file_name, image):
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    file_name_out = save_dir + os.sep + file_name.split('.')[0] + ".png"
+    print(f"Writing {file_name_out}")
+    cv2.imwrite(file_name_out, image)
 
 
 def get_model():
@@ -81,7 +94,7 @@ def get_model():
     """
     model = tf.keras.models.Sequential([
         tf.keras.layers.Conv2D(
-            128, (3, 3), activation="relu", input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)
+            256, (3, 3), activation="relu", input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)
         ),
         tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
         tf.keras.layers.Flatten(),
