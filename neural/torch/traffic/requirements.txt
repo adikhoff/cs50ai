@@ -1,3 +1,5 @@
 opencv-python
 alive-progress
-torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
+# This program requires PyTorch. To use hardware accelleration like the GPU,
+# you need to go to https://pytorch.org/get-started/locally/ , select the
+# appropriate configuration for your hardware, and run the custom pip command.

@@ -15,7 +15,7 @@ class ImageRecognitionNetwork(nn.Module):
             nn.MaxPool2d(kernel_size=2, stride=2),
             nn.Flatten(),
         )
-        self.linear_relu_stack = nn.Sequential(
+        self.neuralnet = nn.Sequential(
             nn.Linear(256 * (img_height // 2) * (img_width // 2), 512),
             nn.ReLU(),
             nn.Linear(512, 512),
@@ -65,7 +65,7 @@ class ImageRecognitionNetworkGrok(nn.Module):
         # IMG_HEIGHT and IMG_WIDTH are divided by 4 due to two MaxPool layers (2x2 each)
         flattened_size = 128 * (img_height // 4) * (img_width // 4)
         
-        self.linear_relu_stack = nn.Sequential(
+        self.neuralnet = nn.Sequential(
             nn.Linear(flattened_size, 512),
             nn.BatchNorm1d(512),
             nn.ReLU(),
@@ -116,7 +116,7 @@ class ImageRecognitionNetworkChatGPT(nn.Module):
             nn.Dropout(0.5)  # Regularization
         )
         
-        self.linear_relu_stack = nn.Sequential(
+        self.neuralnet = nn.Sequential(
             nn.Linear(512 * 4 * 4, 1024),
             nn.ReLU(),
             nn.Dropout(0.5),
