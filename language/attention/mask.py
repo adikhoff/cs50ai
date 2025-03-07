@@ -74,7 +74,7 @@ def visualize_attentions(tokens, attentions):
     # TODO: Update this function to produce diagrams for all layers and heads.
     print(f"tokens: {tokens}")
     firstletters = "".join(list(tok[0] for tok in tokens if tok[0].isalpha()))
-    path = f"{tokens[1]}-{firstletters}"
+    path = f"graph/{tokens[1]}-{firstletters}"
     print(f"dir: {path}")
     for i in range(0, len(attentions)):
         for j in range(0, len(attentions[i][0])):
