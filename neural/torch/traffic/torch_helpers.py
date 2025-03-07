@@ -21,11 +21,16 @@ class LabelDirImageDataset(Dataset):
         print(f"Found {len(self.img_labels)} images in {len(labels)} label directories")
         self.img_dir = data_dir
         self.convert_input = convert_input
+        
+        self.tensor_cache = dict()
 
     def __len__(self):
         return len(self.img_labels)
 
     def __getitem__(self, idx):
+        if idx in self.tensor_cache:
+            return self.tensor_cache[idx]
+        
         img_path = os.path.join(self.img_dir, self.img_labels[idx][0])
         label = self.img_labels[idx][1]
         image = cv2.imread(img_path)
@@ -33,6 +38,8 @@ class LabelDirImageDataset(Dataset):
             image = self.convert_input(image)
 
         tensor = tf.to_tensor(image)
+        self.tensor_cache[idx] = (tensor, label)
+        
         return (tensor, label)
 
 
