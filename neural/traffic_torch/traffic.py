@@ -24,10 +24,9 @@ device = torch.accelerator.current_accelerator().type if torch.accelerator.is_av
 print(f"Using {device} device")
 
 
-def show_image(img, label):
-    img = img.permute(1, 2, 0)
-    print(f"Label: {label}")
-    plt.imshow(img, cmap="gray")
+def show_image(img, index, label):
+    print(f"Showing image {index} with label: {label}")
+    plt.imshow(img.permute(1, 2, 0), cmap="gray")
     plt.show()
 
 def main():
@@ -37,22 +36,18 @@ def main():
         sys.exit("Usage: python traffic.py data_directory [model.h5]")
 
     # Get image arrays and labels for all image files
-    loader = load_data(sys.argv[1])
+    dataset = load_data(sys.argv[1])
+    
+    train_dataset, test_dataset = torch.utils.data.random_split(dataset, [1 - TEST_SIZE, TEST_SIZE])
+    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=True)
     
     # Display image and label.
-    images, labels = next(iter(loader))
-    print(f"Feature batch shape: {images.size()}")
-    print(f"Labels batch shape: {labels.size()}")
+    images, labels = next(iter(train_loader))
     for i in range(0, 5):
         img = images[i]
         label = labels[i]
-        show_image(img, label)
-
-    # Split data into training and testing sets
-    # labels = tf.keras.utils.to_categorical(labels)
-    # x_train, x_test, y_train, y_test = train_test_split(
-    #     np.array(images), np.array(labels), test_size=TEST_SIZE
-    # )
+        show_image(img, i, label)
 
     # # Get a compiled neural network
     # model = get_model()
@@ -70,43 +65,36 @@ def main():
     #     print(f"Model saved to {filename}.")
 
 
-class LabelDirImageDataset(Dataset):
-    def __init__(self, data_dir, transform=None):
-        self.img_labels = []
-        for i in range(0, NUM_CATEGORIES):
-            dir = os.path.join(data_dir, str(i))
-            for file_name in os.listdir(dir):
-                self.img_labels.append((os.path.join(str(i), file_name), i))
-        
-        self.img_dir = data_dir
-        self.transform = transform
-
-    def __len__(self):
-        return len(self.img_labels)
-
-    def __getitem__(self, idx):
-        img_path = os.path.join(self.img_dir, self.img_labels[idx][0])
-        image = cv2.imread(img_path)
-        label = self.img_labels[idx][1]
-        if self.transform:
-            image = self.transform(image)
-
-        return (tf.to_tensor(image), label)
-
-
 def load_data(data_dir):
     """
-    Create loader for image data from directory `data_dir`.
+    Create dataset for image data from directory `data_dir`.
     """
-    def adjust_cv2(image):
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) # Change from BGR to RGB
-        height, width = image.shape[:2]
-        if height != IMG_HEIGHT or width != IMG_WIDTH: # Make uniform size
-            image = cv2.resize(image, (IMG_HEIGHT, IMG_WIDTH), interpolation=cv2.INTER_AREA)
-        return image
-    
-    dataset = LabelDirImageDataset(data_dir, transform=adjust_cv2)
-    return DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
+    class LabelDirImageDataset(Dataset):
+        def __init__(self, data_dir):
+            print(f"Investigating {data_dir}...")
+            self.img_labels = []
+            for i in range(0, NUM_CATEGORIES):
+                dir = os.path.join(data_dir, str(i))
+                for file_name in os.listdir(dir):
+                    self.img_labels.append((os.path.join(str(i), file_name), i))
+            print(f"Found {len(self.img_labels)} images in {NUM_CATEGORIES} label directories")
+            self.img_dir = data_dir
+
+        def __len__(self):
+            return len(self.img_labels)
+
+        def __getitem__(self, idx):
+            img_path = os.path.join(self.img_dir, self.img_labels[idx][0])
+            label = self.img_labels[idx][1]
+            image = cv2.cvtColor(cv2.imread(img_path), cv2.COLOR_BGR2RGB) # Change from BGR to RGB
+            height, width = image.shape[:2]
+            if height != IMG_HEIGHT or width != IMG_WIDTH: # Make uniform size
+                image = cv2.resize(image, (IMG_HEIGHT, IMG_WIDTH), interpolation=cv2.INTER_AREA)
+
+            tensor = tf.to_tensor(image)
+            return (tensor, label)
+
+    return LabelDirImageDataset(data_dir)
 
 
 def get_model():
