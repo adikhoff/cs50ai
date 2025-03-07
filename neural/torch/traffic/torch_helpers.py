@@ -50,7 +50,7 @@ class ModelRunner(ABC):
             for inputs, labels in loader:
                 inputs = inputs.to(self.device)
                 labels = labels.to(self.device)
-                loss = self.process(self.model, inputs, labels, self.criterion)
+                loss = self.process(inputs, labels)
                 self._last_loss = loss
                 bar.text(f"loss: {loss.item()}")
                 bar()
@@ -62,7 +62,7 @@ class ModelRunner(ABC):
         pass
     
     @abstractmethod
-    def process(self, model, inputs, labels, criterion):
+    def process(self, inputs, labels):
         pass
     
     @abstractmethod
@@ -74,10 +74,10 @@ class TrainingRunner(ModelRunner):
     def setup(self, model):
         model.train()
         
-    def process(self, model, inputs, labels, criterion):
+    def process(self, inputs, labels):
         self.optimizer.zero_grad()
-        outputs = model(inputs)
-        loss = criterion(outputs, labels)
+        outputs = self.model(inputs)
+        loss = self.criterion(outputs, labels)
         loss.backward()
         self.optimizer.step()
         return loss
@@ -95,10 +95,10 @@ class TestRunner(ModelRunner):
     def setup(self, model):
         model.eval()
         
-    def process(self, model, inputs, labels, criterion):
+    def process(self, inputs, labels):
         with torch.no_grad():
-            outputs = model(inputs)
-            loss = criterion(outputs, labels)
+            outputs = self.model(inputs)
+            loss = self.criterion(outputs, labels)
             _, predicted = torch.max(outputs.data, 1)
             self.total_loss += loss.item()
             self.total += labels.size(0)
