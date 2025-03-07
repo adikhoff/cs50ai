@@ -35,6 +35,7 @@ class LabelDirImageDataset(Dataset):
         tensor = tf.to_tensor(image)
         return (tensor, label)
 
+
 class ModelRunner(ABC):
     def __init__(self, config):
         self.device = config["device"]
@@ -45,13 +46,13 @@ class ModelRunner(ABC):
     
     def run_model(self, loader):
         self.setup(loader)
-        with alive_bar(len(loader)) as bar:
+        with alive_bar(len(loader) * loader.batch_size) as bar:
             for inputs, labels in loader:
                 inputs = inputs.to(self.device)
                 labels = labels.to(self.device)
                 loss = self.process(inputs, labels)
                 bar.text(f"loss: {loss.item()}")
-                bar()
+                bar(loader.batch_size)
                 
         return self.get_results()
     
@@ -84,6 +85,7 @@ class TrainingRunner(ModelRunner):
     def get_results(self):
         return self._last_loss
     
+
 class TestRunner(ModelRunner):
     def __init__(self, config):
         super().__init__(config)

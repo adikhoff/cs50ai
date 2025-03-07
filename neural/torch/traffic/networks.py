@@ -1,5 +1,11 @@
 from torch import nn
 
+"""
+Network that I created myself, based on the original
+TensorFlow network, which was based on the lecture.
+"""
+
+
 class ImageRecognitionNetwork(nn.Module):
     def __init__(self, img_height, img_width, num_categories):
         super().__init__()
@@ -7,7 +13,6 @@ class ImageRecognitionNetwork(nn.Module):
             nn.Conv2d(3, 256, kernel_size=3, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Dropout(0.25),
             nn.Flatten(),
         )
         self.linear_relu_stack = nn.Sequential(
@@ -22,6 +27,16 @@ class ImageRecognitionNetwork(nn.Module):
     def forward(self, x):
         x = self.convolution(x)
         return self.linear_relu_stack(x)
+
+
+"""
+Network after I asked Grok to improve it. Not sure what
+all the steps do, but a couple of key points:
+* Most of the work is done by the convolution sequence.
+* Convolution sequence has dropout configured.
+* Added BatchNorm steps, which (I think) helps keep the
+  network optimized for backward propagation.
+"""
 
 
 class ImageRecognitionNetworkAI(nn.Module):

@@ -1,6 +1,5 @@
 import sys
 
-import matplotlib.pyplot as plt
 import cv2
 
 import torch
@@ -26,11 +25,6 @@ BATCH_SIZE = 64
 device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
 print(f"Using {device} device")
 
-
-def show_image(img, index, label):
-    print(f"Showing image {index} with label: {label}")
-    plt.imshow(img.permute(1, 2, 0), cmap="gray")
-    plt.show()
 
 def main():
 
@@ -81,9 +75,9 @@ def load_data(data_dir):
     Create dataset for image data from directory `data_dir`.
     """
     def convert_image(image):
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) # Change from BGR to RGB
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Change from BGR to RGB
         height, width = image.shape[:2]
-        if height != IMG_HEIGHT or width != IMG_WIDTH: # Make uniform size
+        if height != IMG_HEIGHT or width != IMG_WIDTH:  # Make uniform size
             image = cv2.resize(image, (IMG_HEIGHT, IMG_WIDTH), interpolation=cv2.INTER_AREA)
         return image
     
@@ -98,6 +92,7 @@ def get_model():
     """
        
     return ImageRecognitionNetworkAI(IMG_HEIGHT, IMG_WIDTH, NUM_CATEGORIES)
+
 
 if __name__ == "__main__":
     main()
