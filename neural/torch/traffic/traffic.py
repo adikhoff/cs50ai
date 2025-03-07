@@ -12,7 +12,8 @@ from torch_helpers import TrainingRunner
 from torch_helpers import TestRunner
 
 from networks import ImageRecognitionNetwork
-from networks import ImageRecognitionNetworkAI
+from networks import ImageRecognitionNetworkGrok
+from networks import ImageRecognitionNetworkChatGPT
 
 EPOCHS = 10
 IMG_WIDTH = 30
@@ -91,7 +92,7 @@ def get_model():
     The output layer should have `NUM_CATEGORIES` units, one for each category.
     """
        
-    return ImageRecognitionNetworkAI(IMG_HEIGHT, IMG_WIDTH, NUM_CATEGORIES)
+    return ImageRecognitionNetworkChatGPT(IMG_WIDTH, IMG_HEIGHT, NUM_CATEGORIES)
 
 
 if __name__ == "__main__":
