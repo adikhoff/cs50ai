@@ -12,6 +12,8 @@ from torch_helpers import LabelDirImageDataset
 from torch_helpers import TrainingRunner
 from torch_helpers import TestRunner
 
+from networks import ImageRecognitionNetwork
+from networks import ImageRecognitionNetworkAI
 
 EPOCHS = 10
 IMG_WIDTH = 30
@@ -94,30 +96,8 @@ def get_model():
     `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
     The output layer should have `NUM_CATEGORIES` units, one for each category.
     """
-    class NeuralNetwork(nn.Module):
-        def __init__(self):
-            super().__init__()
-            self.convolution = nn.Sequential(
-                nn.Conv2d(3, 256, kernel_size=3, padding=1),
-                nn.ReLU(),
-                nn.MaxPool2d(kernel_size=2, stride=2),
-                nn.Dropout(0.25),
-                nn.Flatten(),
-            )
-            self.linear_relu_stack = nn.Sequential(
-                nn.Linear(256 * (IMG_HEIGHT // 2) * (IMG_WIDTH // 2), 512),
-                nn.ReLU(),
-                nn.Linear(512, 512),
-                nn.ReLU(),
-                nn.Dropout(0.5),
-                nn.Linear(512, NUM_CATEGORIES),
-            )
-
-        def forward(self, x):
-            x = self.convolution(x)
-            return self.linear_relu_stack(x)
-        
-    return NeuralNetwork()
+       
+    return ImageRecognitionNetworkAI(IMG_HEIGHT, IMG_WIDTH, NUM_CATEGORIES)
 
 if __name__ == "__main__":
     main()
