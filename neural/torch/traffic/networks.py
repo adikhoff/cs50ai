@@ -26,7 +26,7 @@ class ImageRecognitionNetwork(nn.Module):
 
     def forward(self, x):
         x = self.convolution(x)
-        return self.linear_relu_stack(x)
+        return self.neuralnet(x)
 
 
 """
@@ -79,7 +79,7 @@ class ImageRecognitionNetworkGrok(nn.Module):
 
     def forward(self, x):
         x = self.convolution(x)
-        return self.linear_relu_stack(x)
+        return self.neuralnet(x)
 
 
 class ImageRecognitionNetworkChatGPT(nn.Module):
@@ -128,4 +128,4 @@ class ImageRecognitionNetworkChatGPT(nn.Module):
 
     def forward(self, x):
         x = self.convolution(x)
-        return self.linear_relu_stack(x)
+        return self.neuralnet(x)
