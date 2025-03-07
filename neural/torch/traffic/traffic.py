@@ -6,14 +6,13 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 import torch.optim as optim
+from alive_progress import alive_bar
 
 from torch_helpers import LabelDirImageDataset
 from torch_helpers import TrainingRunner
 from torch_helpers import TestRunner
 
-from networks import ImageRecognitionNetwork
-from networks import ImageRecognitionNetworkGrok
-from networks import ImageRecognitionNetworkChatGPT
+import networks
 
 EPOCHS = 10
 IMG_WIDTH = 30
@@ -92,7 +91,7 @@ def get_model():
     The output layer should have `NUM_CATEGORIES` units, one for each category.
     """
        
-    return ImageRecognitionNetworkChatGPT(IMG_WIDTH, IMG_HEIGHT, NUM_CATEGORIES)
+    return networks.ImageRecognitionNetworkGrok(IMG_WIDTH, IMG_HEIGHT, NUM_CATEGORIES)
 
 
 if __name__ == "__main__":
