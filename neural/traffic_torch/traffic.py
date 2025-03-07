@@ -90,6 +90,7 @@ class LabelDirImageDataset(Dataset):
         label = self.img_labels[idx][1]
         if self.transform:
             image = self.transform(image)
+
         return (tf.to_tensor(image), label)
 
 
@@ -97,13 +98,14 @@ def load_data(data_dir):
     """
     Create loader for image data from directory `data_dir`.
     """
-    def resize_cv2(image):
+    def adjust_cv2(image):
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) # Change from BGR to RGB
         height, width = image.shape[:2]
-        if height != IMG_HEIGHT or width != IMG_WIDTH:
+        if height != IMG_HEIGHT or width != IMG_WIDTH: # Make uniform size
             image = cv2.resize(image, (IMG_HEIGHT, IMG_WIDTH), interpolation=cv2.INTER_AREA)
         return image
     
-    dataset = LabelDirImageDataset(data_dir, resize_cv2)
+    dataset = LabelDirImageDataset(data_dir, transform=adjust_cv2)
     return DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
 
 
