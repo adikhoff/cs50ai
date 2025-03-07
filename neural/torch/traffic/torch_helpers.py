@@ -44,21 +44,19 @@ class ModelRunner(ABC):
         print(f"ModelRunner {self.__class__.__name__} initialized with device: {self.device}")
     
     def run_model(self, loader):
-        self._num_batches = len(loader)
-        self.setup(self.model)
+        self.setup(loader)
         with alive_bar(len(loader)) as bar:
             for inputs, labels in loader:
                 inputs = inputs.to(self.device)
                 labels = labels.to(self.device)
                 loss = self.process(inputs, labels)
-                self._last_loss = loss
                 bar.text(f"loss: {loss.item()}")
                 bar()
                 
         return self.get_results()
     
     @abstractmethod
-    def setup(self, model):
+    def setup(self, loader):
         pass
     
     @abstractmethod
@@ -71,8 +69,8 @@ class ModelRunner(ABC):
     
     
 class TrainingRunner(ModelRunner):
-    def setup(self, model):
-        model.train()
+    def setup(self, loader):
+        self.model.train()
         
     def process(self, inputs, labels):
         self.optimizer.zero_grad()
@@ -80,6 +78,7 @@ class TrainingRunner(ModelRunner):
         loss = self.criterion(outputs, labels)
         loss.backward()
         self.optimizer.step()
+        self._last_loss = loss
         return loss
     
     def get_results(self):
@@ -92,8 +91,9 @@ class TestRunner(ModelRunner):
         self.correct = 0
         self.total = 0
         
-    def setup(self, model):
-        model.eval()
+    def setup(self, loader):
+        self._num_batches = len(loader)
+        self.model.eval()
         
     def process(self, inputs, labels):
         with torch.no_grad():
