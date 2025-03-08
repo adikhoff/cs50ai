@@ -23,6 +23,13 @@ class LabelDirImageDataset(Dataset):
         self.convert_input = convert_input
         
         self.tensor_cache = dict()
+        
+        print(f"Prefetching images...")
+        with alive_bar(self.__len__()) as bar:
+            for i in range(0, self.__len__()):
+                self.__getitem__(i)
+                bar()
+                
 
     def __len__(self):
         return len(self.img_labels)
